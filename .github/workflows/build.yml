@@ -28,5 +28,5 @@ jobs:
 
     - name: Run addon command
       run: |
-        php think addon -a quream -c move
+        php think addon -a qurexam -c move
         php think addon -a qurexam -c package
