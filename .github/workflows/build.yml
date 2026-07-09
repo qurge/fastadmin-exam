@@ -14,19 +14,46 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: fastadmin
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Setup PHP 7.4
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: '7.4'
-        tools: composer:v2
+      - name: Create env
+        run: |
+          rm -f .env
+          cat > .env <<EOF
+          [app]
+          debug = false
+          trace = false
+          
+          [database]
+          hostname = 127.0.0.1
+          database = fastadmin
+          username = root
+          password = root
+          hostport = 3306
+          prefix = fa_
+          EOF
 
-    - name: Install dependencies
-      run: composer install --prefer-dist --no-progress
+      - name: Setup PHP 7.4
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.4'
+          tools: composer:v2
 
-    - name: Run addon command
-      run: |
-        php think addon -a qurexam -c move
-        php think addon -a qurexam -c package
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
+
+      - name: Run addon command
+        run: |
+          php think addon -a qurexam -c move
+          php think addon -a qurexam -c package
